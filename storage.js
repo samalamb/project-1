@@ -1,28 +1,71 @@
-/**
-    Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-    Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
-        http://aws.amazon.com/apache2.0/
-    or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
-*/
-
 'use strict';
+
 var AWS = require("aws-sdk");
+var moment = require('moment');
 
-var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'})
-var table = "payItForward";
+var storage = (function () {
+    var dynamodb = new AWS.DynamoDB({apiVersion: '2012-08-10'});
+    // GMT -5:00 or 5 hours
+    var today = moment().subtract(8, 'hours').format('l');
 
-var params = {
-    TableName:table,
-    Key:{
-        "goalForTheDay": goalForTheDay,
-        "goal": goal
-    },
-    UpdateExpression: "remove info.actors[0]",
-    ConditionExpression: "size(info.actors) > :num",
-    ExpressionAttributeValues:{
-        ":num":3
-    },
-    ReturnValues:"UPDATED_NEW"
-};
+    function Goal(session, data) {
+        if (data) {
+            this.data = data;
+        } else {
+            this.data = {
+              Description: {
+                SSML: "<speak>Something went wrong. Please try again soon.</speak>",
+                Text: "Something went wrong. Please try again soon."
+              },
+              Image: {
+                largeURL: "na",
+                smallURL: "na"
+              },
+              InvocationName: "na",
+              goalForToday: today,
+              Goal: "na"
+            };
+        }
+        this._session = session;
+    }
 
-module.exports = params;
+    return {
+        loadGoal: function (session, callback) {
+            if (session.attributes.currentGoal) {
+                console.log('get goal from session=' + session.attributes.currentGoal);
+                callback(new Goal(session, session.attributes.currentGoal));
+                return;
+            }
+
+            dynamodb.getItem({
+                TableName: 'payItForward',
+                Key: {
+                    'goalForToday' : {
+                        S: today
+                    }
+               }
+            }, function (err, data) {
+                var currentGoal;
+                if (err) {
+                    console.log(err, err.stack);
+                    //WTF!
+                    currentGoal = new Goal(session);
+                    session.attributes.currentGoal = currentGoal.data;
+                    callback(currentGoal);
+                } else if (data) {
+                    //console.log(data);
+                    //onsole.log(moment());
+                    currentGoal = new Goal(session, data);
+                    callback(currentGoal);
+                } else {
+                    // This should nevere ever happen!!!
+                    console.log(data);
+                    currentGoal = new Goal(session);
+                    session.attributes.currentGoal = currentGoal.data;
+                    callback(currentGoal);
+                }
+            });
+        },
+    };
+})();
+module.exports = storage;
