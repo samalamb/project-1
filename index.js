@@ -18,7 +18,7 @@
 /**
  * App ID for the Goal
  */
-var APP_ID = amzn1.echo-sdk-ams.app.8e1cf101-6851-41ca-baf2-a267513bd6f5; //replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
+var APP_ID = 'amzn1.echo-sdk-ams.app.8e1cf101-6851-41ca-baf2-a267513bd6f5'; //replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
 /**
  * The AlexaSkill prototype and helper functions
  */
@@ -75,7 +75,25 @@ PayItForward.prototype.intentHandlers = {
         getTodaysGoal(session, response);
     },
     "AMAZON.YesIntent": function (intent, session, response) {
+      if (session.attributes.help === 'YES') {
+          getTodaysGoal(session, response);
+        } else {
+          storage.loadGoal(session, function (currentGoal) {
+            var speechText = '';
+            if (currentGoal.data.Goal === "na") {
+                response.tell('There is no goal for today.');
+                return;
+            } else {
+              speechText += currentGoal.data.Item.Speak.S;
 
+              var speechOutput = {
+                  speech: speechText,
+                  type: AlexaSkill.speechOutputType.SSML
+              };
+              response.tell(speechOutput)
+            }
+          });
+        }
     },
     "AMAZON.NoIntent": function (intent, session, response) {
       speachOutput = "Okay.";
@@ -100,6 +118,6 @@ PayItForward.prototype.intentHandlers = {
 // Create the handler that responds to the Alexa Request.
 exports.handler = function (event, context) {
     // Create an instance of the PayItForward Goal.
-    var PayItForward = new PayItForward();
-    PayItForward.execute(event, context);
+    var payItForward = new PayItForward();
+    payItForward.execute(event, context);
 };
