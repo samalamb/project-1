@@ -18,7 +18,7 @@
 /**
  * App ID for the Goal
  */
-var APP_ID = undefined; //replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
+var APP_ID = amzn1.echo-sdk-ams.app.8e1cf101-6851-41ca-baf2-a267513bd6f5; //replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
 /**
  * The AlexaSkill prototype and helper functions
  */
@@ -36,7 +36,7 @@ var PayItForward = function () {
 };
 
 // Extend AlexaSkill
-PayItForward.prototype = Object.create(AlexaSkill .prototype);
+PayItForward.prototype = Object.create(AlexaSkill.prototype);
 PayItForward.prototype.constructor = PayItForward;
 
 PayItForward.prototype.eventHandlers.onLaunch = function (launchRequest, session, resposne) {
@@ -71,7 +71,7 @@ var getTodaysGoal = function (session, response) {
 
 PayItForward.prototype.intentHandlers = {
     // register custom intent handlers
-    "PayItForwardIntent": function (intent, session, response) {
+    "PayItForward": function (intent, session, response) {
         getTodaysGoal(session, response);
     },
     "AMAZON.YesIntent": function (intent, session, response) {
