@@ -40,7 +40,7 @@ var storage = (function () {
             dynamodb.getItem({
                 TableName: 'payItForward',
                 Key: {
-                    'goalForToday' : {
+                    'goalForTheDay' : {
                         S: today
                     }
                }

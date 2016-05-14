@@ -110,7 +110,7 @@ PayItForward.prototype.intentHandlers = {
     "PayItForward": function (intent, session, response) {
       trackEvent(
       'Intent',
-      'AMAZON.NoIntent',
+      'PayItForward',
       'na',
       '100', // Event value must be numeric.
       function(err) {
@@ -123,7 +123,7 @@ PayItForward.prototype.intentHandlers = {
     "AMAZON.YesIntent": function (intent, session, response) {
       trackEvent(
       'Intent',
-      'AMAZON.NoIntent',
+      'AMAZON.YesIntent',
       'na',
       '100', // Event value must be numeric.
       function(err) {
