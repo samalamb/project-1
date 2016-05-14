@@ -39,6 +39,42 @@ var PayItForward = function () {
 PayItForward.prototype = Object.create(AlexaSkill.prototype);
 PayItForward.prototype.constructor = PayItForward;
 
+var express = require('express');
+var request = require('request');
+
+var app = express();
+
+var GA_TRACKING_ID = 'UA-76518247-2';
+
+function trackEvent(category, action, label, value, cb) {
+  var data = {
+    v: '1', // API Version.
+    tid: GA_TRACKING_ID, // Tracking ID / Property ID.
+    // Anonymous Client Identifier. Ideally, this should be a UUID that
+    // is associated with particular user, device, or browser instance.
+    cid: '555',
+    t: 'event', // Event hit type.
+    ec: category, // Event category.
+    ea: action, // Event action.
+    el: label, // Event label.
+    ev: value, // Event value.
+  };
+
+  request.post(
+    'http://www.google-analytics.com/collect', {
+      form: data
+    },
+    function(err, response) {
+      if (err) { return cb(err); }
+      if (response.statusCode !== 200) {
+        return cb(new Error('Tracking failed'));
+      }
+      cb();
+    }
+  );
+}
+
+
 PayItForward.prototype.eventHandlers.onLaunch = function (launchRequest, session, resposne) {
   getTodaysGoal(session, response);
 };
@@ -72,46 +108,106 @@ var getTodaysGoal = function (session, response) {
 PayItForward.prototype.intentHandlers = {
     // register custom intent handlers
     "PayItForward": function (intent, session, response) {
+      trackEvent(
+      'Intent',
+      'AMAZON.NoIntent',
+      'na',
+      '100', // Event value must be numeric.
+      function(err) {
+        if (err) {
+            return next(err);
+        }
         getTodaysGoal(session, response);
+      });
     },
     "AMAZON.YesIntent": function (intent, session, response) {
-      if (session.attributes.help === 'YES') {
-          getTodaysGoal(session, response);
-        } else {
-          storage.loadGoal(session, function (currentGoal) {
-            var speechText = '';
-            if (currentGoal.data.Goal === "na") {
-                response.tell('There is no goal for today.');
-                return;
-            } else {
-              speechText += currentGoal.data.Item.Speak.S;
-
-              var speechOutput = {
-                  speech: speechText,
-                  type: AlexaSkill.speechOutputType.SSML
-              };
-              response.tell(speechOutput)
-            }
-          });
+      trackEvent(
+      'Intent',
+      'AMAZON.NoIntent',
+      'na',
+      '100', // Event value must be numeric.
+      function(err) {
+        if (err) {
+            return next(err);
         }
+        if (session.attributes.help === 'YES') {
+            getTodaysGoal(session, response);
+          } else {
+            storage.loadGoal(session, function (currentGoal) {
+              var speechText = '';
+              if (currentGoal.data.Goal === "na") {
+                  response.tell('There is no goal for today.');
+                  return;
+              } else {
+                speechText += currentGoal.data.Item.Speak.S;
+
+                var speechOutput = {
+                    speech: speechText,
+                    type: AlexaSkill.speechOutputType.SSML
+                };
+                response.tell(speechOutput)
+              }
+            });
+          }
+      });
     },
     "AMAZON.NoIntent": function (intent, session, response) {
-      speachOutput = "Okay.";
-      response.tell(speachOutput);
+      trackEvent(
+      'Intent',
+      'AMAZON.NoIntent',
+      'na',
+      '100', // Event value must be numeric.
+      function(err) {
+        if (err) {
+            return next(err);
+        }
+        var speechOutput = "Okay.";
+        response.tell(speechOutput);
+      });
     },
     "AMAZON.HelpIntent": function (intent, session, response) {
       var speechOutput = " ";
     },
     "AMAZON.CancelIntent": function (intent, session, response) {
-      speachOutput = "Okay.";
-      response.tell(speachOutput);
+      trackEvent(
+      'Intent',
+      'AMAZON.CancelIntent',
+      'na',
+      '100', // Event value must be numeric.
+      function(err) {
+        if (err) {
+            return next(err);
+        }
+        var speechOutput = "Okay.";
+        response.tell(speechOutput);
+      });
     },
     "AMAZON.RepeatIntent": function (intent, session, response) {
-      getTodaysGoal(session, reponse);
+      trackEvent(
+      'Intent',
+      'AMAZON.RepeatIntent',
+      'na',
+      '100', // Event value must be numeric.
+      function(err) {
+        if (err) {
+            return next(err);
+        }
+        getTodaysGoal(session, reponse);
+      });
     },
     "AMAZON.StopIntent": function (intent, session, resposne) {
-      speachOutput = "Okay.";
-      response.tell(speachOutput);
+      trackEvent(
+      'Intent',
+      'AMAZON.StopIntent',
+      'na',
+      '100', // Event value must be numeric.
+      function(err) {
+        if (err) {
+            return next(err);
+        }
+        var speechOutput = "Okay.";
+        response.tell(speechOutput);
+      });
     }
 };
 
