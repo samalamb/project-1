@@ -136,21 +136,12 @@ Response.prototype = (function () {
                 outputSpeech: createSpeechObject(options.reprompt)
             };
         }
-        if(options.cardTitle && options.cardContent && options.cardImages) {
+        if (options.cardTitle && options.cardContent) {
             alexaResponse.card = {
                 type: "Simple",
                 title: options.cardTitle,
-                content: options.cardContent,
-                images: options.cardImages
+                content: options.cardContent
             };
-        }
-        else if (options.cardTitle && options.cardContent) {
-          alexaResponse.card = {
-              type: "Simple",
-              title: options.cardTitle,
-              content: options.cardContent,
-              images: options.cardImages
-          };
         }
         var returnResult = {
                 version: '1.0',
@@ -187,14 +178,13 @@ Response.prototype = (function () {
                 shouldEndSession: false
             }));
         },
-        askWithCard: function (speechOutput, repromptSpeech, cardTitle, cardContent, cardImages) {
+        askWithCard: function (speechOutput, repromptSpeech, cardTitle, cardContent) {
             this._context.succeed(buildSpeechletResponse({
                 session: this._session,
                 output: speechOutput,
                 reprompt: repromptSpeech,
                 cardTitle: cardTitle,
                 cardContent: cardContent,
-                cardImages: cardImages,
                 shouldEndSession: false
             }));
         }

@@ -98,7 +98,7 @@ var getTodaysGoal = function (session, response) {
               type: AlexaSkill.speechOutputType.PLAIN_TEXT
           };
           session.attributes.help = 'NO';
-          buildSpeechletResponse("Pay for someone's coffee today. They will greatly appreciate it.", repromptOutput, "Here is your goal for today: ", "", "<img src='https://s3.amazonaws.com/payitforwardbig/IMG_0015.jpg' >");
+          response.askWithCard(speechOutput, repromptOutput, "Here is your goal for today: ", currentGoal.data.Item.Card.S, currentGoal.data.Image.s);
       }
   });
 };
