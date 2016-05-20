@@ -136,9 +136,17 @@ Response.prototype = (function () {
                 outputSpeech: createSpeechObject(options.reprompt)
             };
         }
-        if (options.cardTitle && options.cardContent) {
+        if (options.cardTitle && options.cardContent && options.cardImages) {
             alexaResponse.card = {
-                type: "Simple",
+                type: "Standard",
+                title: options.cardTitle,
+                content: options.cardContent,
+                images: options.cardImages
+            };
+        }
+        else if (options.cardTitle && options.cardContent) {
+            alexaResponse.card = {
+                type: "Standard",
                 title: options.cardTitle,
                 content: options.cardContent
             };
@@ -161,12 +169,13 @@ Response.prototype = (function () {
                 shouldEndSession: true
             }));
         },
-        tellWithCard: function (speechOutput, cardTitle, cardContent) {
+        tellWithCard: function (speechOutput, cardTitle, cardContent, cardImages) {
             this._context.succeed(buildSpeechletResponse({
                 session: this._session,
                 output: speechOutput,
                 cardTitle: cardTitle,
                 cardContent: cardContent,
+                cardImages: cardImages,
                 shouldEndSession: true
             }));
         },
@@ -178,13 +187,13 @@ Response.prototype = (function () {
                 shouldEndSession: false
             }));
         },
-        askWithCard: function (speechOutput, repromptSpeech, cardTitle, cardContent) {
+        askWithCard: function (speechOutput, repromptSpeech, cardTitle, cardImages) {
             this._context.succeed(buildSpeechletResponse({
                 session: this._session,
                 output: speechOutput,
                 reprompt: repromptSpeech,
                 cardTitle: cardTitle,
-                cardContent: cardContent,
+                cardImages: cardImages,
                 shouldEndSession: false
             }));
         }
