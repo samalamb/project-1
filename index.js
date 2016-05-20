@@ -24,7 +24,8 @@ var APP_ID = 'amzn1.echo-sdk-ams.app.8e1cf101-6851-41ca-baf2-a267513bd6f5'; //re
  */
 var AlexaSkill = require('./AlexaSkill');
 var storage = require('./storage');
-
+var express = require('express');
+var request = require('request');
 /**
  * PayItForward is a child of AlexaSkill.
  * To read more about inheritance in JavaScript, see the link below.
@@ -38,9 +39,6 @@ var PayItForward = function () {
 // Extend AlexaSkill
 PayItForward.prototype = Object.create(AlexaSkill.prototype);
 PayItForward.prototype.constructor = PayItForward;
-
-var express = require('express');
-var request = require('request');
 
 var app = express();
 
@@ -75,7 +73,7 @@ function trackEvent(category, action, label, value, cb) {
 }
 
 
-PayItForward.prototype.eventHandlers.onLaunch = function (launchRequest, session, resposne) {
+PayItForward.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
   getTodaysGoal(session, response);
 };
 
@@ -83,6 +81,7 @@ var getTodaysGoal = function (session, response) {
 
   storage.loadGoal(session, function (currentGoal) {
       var speechText = '';
+      var repromptText = 'Placeholder';
       if (currentGoal.data.Goal === "na") {
           response.tell('There is no Goal for today.');
           return;
@@ -99,7 +98,7 @@ var getTodaysGoal = function (session, response) {
               type: AlexaSkill.speechOutputType.PLAIN_TEXT
           };
           session.attributes.help = 'NO';
-          response.askWithCard(speechOutput, repromptOutput, currentGoal.data.Item.Goal.S, currentGoal.data.Item.Card.S);
+          buildSpeechletResponse("Pay for someone's coffee today. They will greatly appreciate it.", repromptOutput, "Here is your goal for today: ", "", "<img src='https://s3.amazonaws.com/payitforwardbig/IMG_0015.jpg' >");
       }
   });
 };
@@ -166,7 +165,8 @@ PayItForward.prototype.intentHandlers = {
       });
     },
     "AMAZON.HelpIntent": function (intent, session, response) {
-      var speechOutput = " ";
+      var speechOutput = "Pay it forward is a skill that will help make peoples days better one little goal at a time.";
+      response.tell(speechOutput);
     },
     "AMAZON.CancelIntent": function (intent, session, response) {
       trackEvent(
@@ -192,7 +192,7 @@ PayItForward.prototype.intentHandlers = {
         if (err) {
             return next(err);
         }
-        getTodaysGoal(session, reponse);
+        getTodaysGoal(session, response);
       });
     },
     "AMAZON.StopIntent": function (intent, session, resposne) {

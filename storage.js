@@ -22,7 +22,7 @@ var storage = (function () {
                 smallURL: "na"
               },
               InvocationName: "na",
-              goalForToday: today,
+              goalForTheDay: today,
               Goal: "na"
             };
         }
@@ -41,7 +41,7 @@ var storage = (function () {
                 TableName: 'payItForward',
                 Key: {
                     'goalForTheDay' : {
-                        S: today
+                        S: "5/14/2016"
                     }
                }
             }, function (err, data) {
