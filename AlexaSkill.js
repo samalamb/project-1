@@ -125,29 +125,80 @@ function createSpeechObject(optionsParam) {
     }
 }
 
+Response.prototype = (function () {
+    var buildSpeechletResponse = function (options) {
+        var alexaResponse = {
+            outputSpeech: createSpeechObject(options.output),
+            shouldEndSession: options.shouldEndSession
+        };
+        if (options.reprompt) {
+            alexaResponse.reprompt = {
+                outputSpeech: createSpeechObject(options.reprompt)
+            };
+        }
+        if(options.cardTitle && options.cardContent && options.cardImages) {
+            alexaResponse.card = {
+                type: "Simple",
+                title: options.cardTitle,
+                content: options.cardContent,
+                images: options.cardImages
+            };
+        }
+        else if (options.cardTitle && options.cardContent) {
+          alexaResponse.card = {
+              type: "Simple",
+              title: options.cardTitle,
+              content: options.cardContent,
+              images: options.cardImages
+          };
+        }
+        var returnResult = {
+                version: '1.0',
+                response: alexaResponse
+        };
+        if (options.session && options.session.attributes) {
+            returnResult.sessionAttributes = options.session.attributes;
+        }
+        return returnResult;
+    };
 
-var buildSpeechletResponse = function (options) {
     return {
-      outputSpeech: {
-        type: "PlainText",
-        text: output
-      },
-      card: {
-        type: "Standard",
-        title: "Goal of the Day: ",
-        images: {
-          smallImageUrl: smallImage,
-          largeImageUrl: largeImage
+        tell: function (speechOutput) {
+            this._context.succeed(buildSpeechletResponse({
+                session: this._session,
+                output: speechOutput,
+                shouldEndSession: true
+            }));
+        },
+        tellWithCard: function (speechOutput, cardTitle, cardContent) {
+            this._context.succeed(buildSpeechletResponse({
+                session: this._session,
+                output: speechOutput,
+                cardTitle: cardTitle,
+                cardContent: cardContent,
+                shouldEndSession: true
+            }));
+        },
+        ask: function (speechOutput, repromptSpeech) {
+            this._context.succeed(buildSpeechletResponse({
+                session: this._session,
+                output: speechOutput,
+                reprompt: repromptSpeech,
+                shouldEndSession: false
+            }));
+        },
+        askWithCard: function (speechOutput, repromptSpeech, cardTitle, cardContent, cardImages) {
+            this._context.succeed(buildSpeechletResponse({
+                session: this._session,
+                output: speechOutput,
+                reprompt: repromptSpeech,
+                cardTitle: cardTitle,
+                cardContent: cardContent,
+                cardImages: cardImages,
+                shouldEndSession: false
+            }));
         }
-      },
-      reprompt: {
-        outputSpeech: {
-          type: "PlainText",
-          text: repromptText
-        }
-      },
-      shouldEndSession: false
-    }
-  }
+    };
+})();
 
 module.exports = AlexaSkill;
