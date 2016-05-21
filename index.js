@@ -99,11 +99,12 @@ var getTodaysGoal = function (session, response) {
           };
           session.attributes.help = 'NO';
           response.askWithCard(speechOutput,
-                               repromptOutput, 
-                               "Here is your goal for today",
-                               currentGoal.data.Item.Card.S,
-                               {smallImageUrl: currentGoal.data.smallImageUrl.S,
-                               largeImageUrl: currentGoal.data.largeImageUrl.S});
+                               repromptOutput,
+                               "Here is Your Goal for Today: ",
+                               {
+                                 smallImageUrl: currentGoal.data.Item.smallImageUrl.S,
+                                 largeImageUrl: currentGoal.data.Item.largeImageUrl.S
+                               });
       }
   });
 };

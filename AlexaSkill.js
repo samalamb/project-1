@@ -136,11 +136,11 @@ Response.prototype = (function () {
                 outputSpeech: createSpeechObject(options.reprompt)
             };
         }
-        if (options.cardTitle && options.cardContent && options.cardImages) {
+        if (options.cardTitle && options.cardImages) {
             alexaResponse.card = {
                 type: "Standard",
                 title: options.cardTitle,
-                content: options.cardContent,
+                text: options.cardContent,
                 images: options.cardImages
             };
         }

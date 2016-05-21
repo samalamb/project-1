@@ -18,8 +18,8 @@ var storage = (function () {
                 Text: "Something went wrong. Please try again soon."
               },
               Image: {
-                largeURL: "na",
-                smallURL: "na"
+                largeImageUrl: "na",
+                smallImageUrl: "na"
               },
               InvocationName: "na",
               goalForTheDay: today,
@@ -41,7 +41,7 @@ var storage = (function () {
                 TableName: 'payItForward',
                 Key: {
                     'goalForTheDay' : {
-                        S: "5/14/2016"
+                        S: today
                     }
                }
             }, function (err, data) {
