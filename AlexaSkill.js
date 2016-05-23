@@ -141,7 +141,7 @@ Response.prototype = (function () {
                 type: "Standard",
                 title: options.cardTitle,
                 text: options.cardContent,
-                images: options.cardImages
+                image: options.cardImages
             };
         }
         else if (options.cardTitle && options.cardContent) {
